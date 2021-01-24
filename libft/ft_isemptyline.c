@@ -1,29 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   minishell.h                                        :+:      :+:    :+:   */
+/*   ft_isemptyline.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kiborroq <kiborroq@student.42.fr>          +#+  +:+       +#+        */
+/*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/01/23 16:44:33 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/01/24 15:30:24 by kiborroq         ###   ########.fr       */
+/*   Created: 2020/12/15 23:10:31 by kiborroq          #+#    #+#             */
+/*   Updated: 2021/01/14 23:31:08 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MINISHELL_H
-# define MINISHELL_H
+#include "libft.h"
 
-# include "../libft/libft.h"
-# include "errno.h"
-
-typedef struct	s_comand
+int	ft_isemptyline(char *line)
 {
-	t_list		*tmp_argv;
-	char		*name;
-	char		**argv;
-	char		*path_to_bin;
-	int			pipe_before;
-	int			pipe_after;
-}				t_comand;
-
-#endif
+	while (*line)
+	{
+		if (!ft_isspace(*line))
+			return (0);
+		line++;
+	}
+	return (1);
+}

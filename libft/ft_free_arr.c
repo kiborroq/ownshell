@@ -1,29 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   minishell.h                                        :+:      :+:    :+:   */
+/*   ft_free_arr.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kiborroq <kiborroq@student.42.fr>          +#+  +:+       +#+        */
+/*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/01/23 16:44:33 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/01/24 15:30:24 by kiborroq         ###   ########.fr       */
+/*   Created: 2020/12/15 23:10:31 by kiborroq          #+#    #+#             */
+/*   Updated: 2021/01/14 23:46:46 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MINISHELL_H
-# define MINISHELL_H
+#include "libft.h"
 
-# include "../libft/libft.h"
-# include "errno.h"
-
-typedef struct	s_comand
+void	ft_free_arr(void **array, int height)
 {
-	t_list		*tmp_argv;
-	char		*name;
-	char		**argv;
-	char		*path_to_bin;
-	int			pipe_before;
-	int			pipe_after;
-}				t_comand;
+	int i;
 
-#endif
+	i = 0;
+	if (array)
+	{
+		while (i < height)
+		{
+			if (array[i])
+				free(array[i]);
+			i++;
+		}
+		free(array);
+		array = 0;
+	}
+}

@@ -1,29 +1,40 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   minishell.h                                        :+:      :+:    :+:   */
+/*   ft_uitoa.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kiborroq <kiborroq@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/01/23 16:44:33 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/01/24 15:30:24 by kiborroq         ###   ########.fr       */
+/*   Created: 2020/11/17 16:39:02 by kiborroq          #+#    #+#             */
+/*   Updated: 2020/11/17 16:39:29 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MINISHELL_H
-# define MINISHELL_H
+#include "libft.h"
 
-# include "../libft/libft.h"
-# include "errno.h"
-
-typedef struct	s_comand
+char	*ft_uitoa(unsigned int n)
 {
-	t_list		*tmp_argv;
-	char		*name;
-	char		**argv;
-	char		*path_to_bin;
-	int			pipe_before;
-	int			pipe_after;
-}				t_comand;
+	unsigned int	sep;
+	int				len;
+	int				i;
+	char			*num;
 
-#endif
+	sep = 1;
+	len = 1;
+	i = 0;
+	while (n / sep > 9)
+	{
+		len++;
+		sep *= 10;
+	}
+	if (!(num = ft_calloc(len + 1, sizeof(char))))
+		return (0);
+	while (i < len)
+	{
+		num[i] = n / sep + '0';
+		n %= sep;
+		sep /= 10;
+		i++;
+	}
+	return (num);
+}

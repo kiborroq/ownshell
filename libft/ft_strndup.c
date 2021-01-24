@@ -1,29 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   minishell.h                                        :+:      :+:    :+:   */
+/*   ft_strndup.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kiborroq <kiborroq@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/01/23 16:44:33 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/01/24 15:30:24 by kiborroq         ###   ########.fr       */
+/*   Created: 2020/11/17 16:34:01 by kiborroq          #+#    #+#             */
+/*   Updated: 2020/11/17 16:34:52 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MINISHELL_H
-# define MINISHELL_H
+#include "libft.h"
 
-# include "../libft/libft.h"
-# include "errno.h"
-
-typedef struct	s_comand
+char	*ft_strndup(const char *str, int n)
 {
-	t_list		*tmp_argv;
-	char		*name;
-	char		**argv;
-	char		*path_to_bin;
-	int			pipe_before;
-	int			pipe_after;
-}				t_comand;
+	int		str_len;
+	char	*str_cpy;
 
-#endif
+	str_len = ft_strlen(str);
+	if (str_len < n)
+		n = str_len;
+	str_cpy = (char *)malloc((n + 1) * sizeof(char));
+	if (!str_cpy)
+		return (0);
+	ft_memcpy(str_cpy, str, n);
+	str_cpy[n] = 0;
+	return (str_cpy);
+}

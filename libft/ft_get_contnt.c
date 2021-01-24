@@ -1,29 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   minishell.h                                        :+:      :+:    :+:   */
+/*   ft_get_contnt.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kiborroq <kiborroq@student.42.fr>          +#+  +:+       +#+        */
+/*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/01/23 16:44:33 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/01/24 15:30:24 by kiborroq         ###   ########.fr       */
+/*   Created: 2020/12/15 23:10:31 by kiborroq          #+#    #+#             */
+/*   Updated: 2021/01/14 23:25:28 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MINISHELL_H
-# define MINISHELL_H
+#include "libft.h"
 
-# include "../libft/libft.h"
-# include "errno.h"
-
-typedef struct	s_comand
+void	*ft_get_contnt(t_list *lst, int index)
 {
-	t_list		*tmp_argv;
-	char		*name;
-	char		**argv;
-	char		*path_to_bin;
-	int			pipe_before;
-	int			pipe_after;
-}				t_comand;
+	int i;
+	int lst_size;
 
-#endif
+	i = 0;
+	lst_size = ft_lstsize(lst);
+	while (i < index && i < lst_size - 1)
+	{
+		lst = lst->next;
+		i++;
+	}
+	return (lst->content);
+}

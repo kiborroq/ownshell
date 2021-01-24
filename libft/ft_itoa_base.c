@@ -1,42 +1,42 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_atoi.c                                          :+:      :+:    :+:   */
+/*   ft_itoa_base.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kiborroq <kiborroq@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/11/02 16:11:32 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/01/14 09:20:45 by kiborroq         ###   ########.fr       */
+/*   Created: 2020/11/17 16:46:17 by kiborroq          #+#    #+#             */
+/*   Updated: 2020/11/17 16:46:56 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-int			ft_atoi(const char *str)
+char	*ft_itoa_base(unsigned long n, char *base)
 {
-	int		i;
-	size_t	num;
-	int		sign;
+	unsigned long	base_len;
+	unsigned long	sep;
+	unsigned long	len;
+	char			*num;
+	unsigned long	i;
 
-	i = 0;
-	num = 0;
-	sign = 1;
-	while (ft_isspace(str[i]))
-		i++;
-	if (str[i] == '+' || str[i] == '-')
+	base_len = ft_strlen(base);
+	sep = 1;
+	len = 1;
+	while (n / sep > base_len - 1)
 	{
-		if (str[i] == '-')
-			sign = -1;
-		i++;
+		sep *= base_len;
+		len++;
 	}
-	while (ft_isdigit(str[i]))
-	{
-		num = num * 10 + str[i] - '0';
-		i++;
-	}
-	if (sign > 0 && num > MAX_LONG)
-		return (-1);
-	if (sign < 0 && num - 1 > MAX_LONG)
+	if (!(num = ft_calloc(len + 1, sizeof(char))))
 		return (0);
-	return (num * sign);
+	i = 0;
+	while (i < len)
+	{
+		num[i] = base[n / sep];
+		n %= sep;
+		sep /= base_len;
+		i++;
+	}
+	return (num);
 }

@@ -7,23 +7,23 @@
 
 extern char ** environ;
 
-int main (void)
+int main (int argc, char **argv, char **envv)
 {
-    char buf[100];
-    char **strs;
+    // char buf[100];
+    // char **strs;
 
-    read(0, buf, 99);
-    buf[99] = 0;
+    // read(0, buf, 99);
+    // buf[99] = 0;
 
-    strs = ft_split(buf, ' ');
-    int i = 0;
-    while (strs[i])
-    {
-        printf("|%s|\n", strs[i]);
-        free(strs[i]);
-        i++;
-    }
-    free(strs);
+    // strs = ft_split(buf, ' ');
+    // int i = 0;
+    // while (strs[i])
+    // {
+    //     printf("|%s|\n", strs[i]);
+    //     free(strs[i]);
+    //     i++;
+    // }
+    // free(strs);
     // char * echo_args[] = { "echo", "asld", "asdasd", "123556", NULL };
 
     // if (!fork ()) {
@@ -53,7 +53,6 @@ int main (void)
     // printf ("parent\n");
     // printf ("parent\n");
     
-    
-
+    printf("%s\n", envv[0]);
     return 0;
 }
