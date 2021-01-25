@@ -6,7 +6,7 @@
 /*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/11 10:59:31 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/01/26 02:08:31 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/01/26 02:17:35 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,11 +100,15 @@ char			*get_unexpect_token_message(char c);
 */
 
 char			*ft_strjoin_wrap(char *s1, char *s2);
+char			**bubble_sort(char **envvar);
 
 /*
 **envvar.c - function for enviroment variables treating
 */
 
 char			*get_env(char **envvar, char *target_key, int mode);
+char			**read_envp(char **envp);
+int				get_env_index(char **envvar, char *target_key);
+char			**realloc_envvar(char ***envvar_old); //можно заменить более абстрактной - realloc_strs, я писал для себя.
 
 #endif
