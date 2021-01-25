@@ -7,6 +7,18 @@
 
 extern char ** environ;
 
+void    kk(char **line)
+{
+    printf("kk=%s\n", *line);
+    *line += 2;
+}
+
+void    pr(char **line)
+{
+    printf("pr=%s\n", *line);
+    kk((*line + 2));
+}
+
 int main (int argc, char **argv, char **envv)
 {
     // char buf[100];
@@ -52,7 +64,8 @@ int main (int argc, char **argv, char **envv)
     // printf ("parent\n");
     // printf ("parent\n");
     // printf ("parent\n");
-    
-    printf("%s\n", envv[0]);
+    char *line = "123456789";
+    pr(&line);
+    printf("main=%s\n", line);
     return 0;
 }
