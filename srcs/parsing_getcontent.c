@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parsing_get_content.c                              :+:      :+:    :+:   */
+/*   parsing_getcontent.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/23 16:57:40 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/01/26 01:59:59 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/01/26 18:08:41 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,27 +47,19 @@ char	*get_mask_content(char **line, int type)
 
 char	*get_other_content(char **line, int type)
 {
-	int		i;
 	char	*content;
 	char	*begin;
 
-	i = 0;
 	begin = *line;
 	if (type == IN_QOUTS)
 		while (**line && **line != '\n' &&
 				(**line == '\'' || !isprotect(**line)))
-		{
 			(*line)++;
-			i++;
-		}
 	else
 		while (**line && !ft_isspace(**line) &&
 				!isspecial(*line) && !isprotect(**line))
-		{
 			(*line)++;
-			i++;
-		}
-	content = ft_strndup(begin, i);
+	content = ft_strndup(begin, *line - begin);
 	return (content);
 }
 
@@ -76,22 +68,22 @@ char	*get_env_content(char **line, char **envvar)
 	char	*begin;
 	char	*env_name;
 	char	*content;
-	int		i;
 
-	i = 0;
 	begin = *line;
-	while (ft_isalpha(**line) || **line == '_')
-	{
+	while (ft_isalnum(**line) || **line == '_')
 		(*line)++;
-		i++;
-	}
-	if (i > 0)
+	if (*line > begin)
 	{
-		if (!(env_name = ft_strndup(begin, i)))
+		if (!(env_name = ft_strndup(begin, *line - begin)))
 			return (0);
 		content = get_env(envvar, env_name, 1);
 		content = content == 0 ? ft_strdup("") : ft_strdup(content);
 		free(env_name);
+	}
+	else if (**line == '?')
+	{
+		content = ft_itoa(0); // заменить на exit_code
+		(*line)++;
 	}
 	else
 		content = ft_strdup("$");

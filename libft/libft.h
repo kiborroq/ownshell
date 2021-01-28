@@ -15,6 +15,7 @@
 
 # include <unistd.h>
 # include <stdlib.h>
+# include <stdarg.h>
 
 # define MIN_INT -2147483648
 # define MIN_INT_STR "-2147483648"
@@ -30,6 +31,20 @@ typedef struct		s_list
 	void			*content;
 	struct s_list	*next;
 }					t_list;
+
+/*
+**Struct of printf
+*/
+
+typedef struct		s_struct
+{
+	char			vartype;
+	char			flag;
+	int				width;
+	int				precision;
+	char			*output;
+	int				error;
+}					t_struct;
 
 /*
 **Part 1 - Libc functions
@@ -105,5 +120,36 @@ void				*ft_get_next_contnt(t_list *lst);
 void				*ft_get_contnt(t_list *lst, int index);
 t_list				*ft_lstmap(t_list *lst, void *(*f)(void *),
 								void (*del)(void *));
+
+/*
+**Part 4 - Some more additional functions
+*/
+
+int					ft_printf(const char *input, ...);
+long				ft_printf_coordinator(const char *input, va_list *arg,
+					int result);
+void				read_format(t_struct *output, const char **input,
+					va_list **arg, const char *typedict);
+void				get_output(t_struct **output, const char ***input,
+					va_list ***arg);
+int					check_ifvalid(const char *typedict, char c, int mode);
+char				*ft_strdup_advanced(const char *s1, t_struct ***list,
+					int precision);
+int					convert_to_int(const char ***input, t_struct **output);
+t_struct			create_new_struct(void);
+char				*ft_itoa_ulong_base(unsigned long long n, int base,
+					char vartype);
+int					validate_output(t_struct *output);
+long				print_output(t_struct *output, char vartype, int width,
+					int precision);
+long				print_delimiters(char c, int len, int target);
+long				ft_putstr_advanced(char *s, char vartype, int precision,
+					int maxlen);
+int					max(int a, int b, int c);
+int					ft_isalnum_str(char *str);
+char				*ft_strupcase(char *str);
+char				*ft_strlowcase(char *str);
+char				*ft_strjoin_three(char const *s1, char const *s2,
+					char const *s3);
 
 #endif

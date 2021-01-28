@@ -6,11 +6,26 @@
 /*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/23 16:57:40 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/01/26 01:28:52 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/01/26 18:07:28 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/minishell.h"
+
+int		try_set_fd(t_strs *files, int *fd, int add_out)
+{
+	if (*fd > 0)
+		close(*fd);
+	if (files->marker == REDIR_UOT_MARKER && add_out == 1)
+		*fd = open(files->arr[files->i - 1], O_CREAT | O_RDWR | O_APPEND,
+										S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+	else if (files->marker == REDIR_UOT_MARKER && add_out == 0)
+		*fd = open(files->arr[files->i - 1], O_CREAT | O_RDWR | O_TRUNC,
+										S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+	else
+		*fd = open(files->arr[files->i - 1], O_RDONLY);
+	return (*fd < 0 ? KO : OK);
+}
 
 char	*get_arg(char **line, char **envvar, int type)
 {

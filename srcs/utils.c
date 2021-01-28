@@ -3,38 +3,41 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
+/*   By: aronin <kiborroq@kiborroq.42.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/12 10:34:57 by aronin            #+#    #+#             */
-/*   Updated: 2021/01/26 02:13:35 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/01/26 02:13:35 by aronin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/minishell.h"
 
-char	**bubble_sort(char **envvar)
-{
-	int		swaps;
-	char	*temp;
-	int		i;
+extern int g_env_num;
 
-	swaps = 1;
+char	**sort_az(char **envvar, int swaps, int i)
+{
+	char	**envvar_az;
+	char	*temp;
+
+	envvar_az = (char **)ft_calloc(g_env_num, sizeof(char *));
+	while (envvar[++i])
+		envvar_az[i] = ft_strdup(envvar[i]);
 	while (swaps)
 	{
-		i = 0;
+		i = -1;
 		swaps = 0;
-		while (envvar[i])
+		while (envvar_az[++i] && envvar_az[i + 1])
 		{
-			if (ft_strcmp(envvar[i], envvar[i + 1]) > 0)
+			if (ft_strcmp(envvar_az[i], envvar_az[i + 1]) > 0)
 			{
-				temp = envvar[i];
-				envvar[i] = envvar[i + 1];
-				envvar[i++ + 1] = temp;
+				temp = envvar_az[i];
+				envvar_az[i] = envvar_az[i + 1];
+				envvar_az[i + 1] = temp;
 				swaps++;
 			}
 		}
 	}
-	return (envvar);
+	return (envvar_az);
 }
 
 char	*ft_strjoin_wrap(char *s1, char *s2)
@@ -54,4 +57,21 @@ char	*ft_strjoin_wrap(char *s1, char *s2)
 		free(s2);
 	}
 	return (new);
+}
+
+int		print_error(const char *s1, const char *s2, const char *s3)
+{
+	ft_putstr_fd((char *)s1, 2);
+	if (s2)
+	{
+		ft_putstr_fd(": ", 2);
+		ft_putstr_fd((char *)s2, 2);
+	}
+	if (s3)
+	{
+		ft_putstr_fd(": ", 2);
+		ft_putstr_fd((char *)s3, 2);
+	}
+	ft_putstr_fd("\n", 2);
+	return (1);
 }

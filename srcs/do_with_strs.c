@@ -6,7 +6,7 @@
 /*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/23 16:57:40 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/01/26 01:54:11 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/01/28 02:10:39 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ void	free_strs(char **strs)
 	i = 0;
 	while (strs[i])
 	{
-		free(strs[i]);
+		ft_freeptr((void **)&strs[i]);
 		i++;
 	}
 	free(strs);
@@ -57,10 +57,11 @@ char	**realloc_strs(char **old_strs)
 	return (new_strs);
 }
 
-int		init_strs(t_strs *new)
+int		init_strs(t_strs *new, int marker)
 {
 	if (!(new->arr = (char **)ft_calloc(STRS_SIZE + 1, sizeof(char *))))
 		return (KO);
 	new->size = STRS_SIZE;
+	new->marker = marker;
 	return (OK);
 }

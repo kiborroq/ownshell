@@ -6,7 +6,7 @@
 /*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/23 16:57:40 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/01/26 01:55:59 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/01/26 14:15:50 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,5 +26,17 @@ char	*get_unexpect_token_message(char c)
 		message[len + 1] = c;
 		message[len + 2] = '\'';
 	}
+	return (message);
+}
+
+char	*get_errno_message(char *prefix)
+{
+	char	*message;
+	char	*tmp;
+
+	if (!(tmp = ft_strjoin(prefix, ": ")))
+		return (0);
+	message = ft_strjoin(tmp, strerror(errno));
+	free(tmp);
 	return (message);
 }

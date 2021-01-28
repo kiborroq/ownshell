@@ -21,11 +21,17 @@ INCL_DIR	= incs/
 SRCS		= ${SRCS_DIR}main.c \
 			${SRCS_DIR}comand_parsing_1.c \
 			${SRCS_DIR}comand_parsing_2.c \
-			${SRCS_DIR}parsing_get_content.c \
+			${SRCS_DIR}parsing_getcontent.c \
 			${SRCS_DIR}parsing_utils.c \
 			${SRCS_DIR}do_with_strs.c \
 			${SRCS_DIR}error_message_treat.c \
-			${SRCS_DIR}utils.c 
+			${SRCS_DIR}utils.c  \
+			${SRCS_DIR}process_envp.c \
+			${SRCS_DIR}exec_command.c  \
+			${SRCS_DIR}builtins1.c  \
+			${SRCS_DIR}builtins2.c \
+			${SRCS_DIR}pipes.c \
+			${SRCS_DIR}get_next_line.c
 
 OBJS		= ${SRCS:.c=.o}
 

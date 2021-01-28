@@ -57,7 +57,15 @@ SRCS		= ft_memset.c\
 			ft_numdig.c \
 			ft_freeptr.c \
 			ft_free_arr.c \
-			ft_strrncmp.c
+			ft_strrncmp.c \
+			ft_printf1.c \
+			ft_printf2.c \
+			ft_printf3.c \
+			ft_printf4.c \
+			ft_isalnum_str.c \
+			ft_strupcase.c \
+			ft_strlowcase.c \
+			ft_strjoin_three.c
 SRCS_B		= ft_lstnew.c \
 			ft_lstadd_front.c \
 			ft_lstsize.c \
@@ -85,7 +93,7 @@ ${NAME} : 	${OBJS}
 
 bonus:		${OBJS} ${OBJS_B}
 			@echo Create ${NAME}
-			@ar rc ${NAME} ${OBJS}  ${OBJS_B}
+			@ar rc ${NAME} ${OBJS} ${OBJS_B}
 			@ranlib ${NAME}
 
 all :		${NAME}

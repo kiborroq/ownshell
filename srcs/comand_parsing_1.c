@@ -6,7 +6,7 @@
 /*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/23 16:57:40 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/01/26 01:45:37 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/01/28 10:16:32 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,23 +28,26 @@ void		check_after(char **line, t_comand *com)
 
 int			set_next_arg(char **line, char **envvar, t_comand *com)
 {
-	t_strs	*need;
+	t_strs	*redir;
+	int		*fd;
 
 	if (isredirect(*line))
 	{
-		need = **line == '>' ? &com->redir_out : &com->redir_in;
-		com->add_out = !ft_strncmp(*line, ">>", 2) ? 1 : 0;
+		redir = **line == '>' ? &com->redir_out : &com->redir_in;
+		fd = **line == '>' ? &com->fd_out : &com->fd_in;
+		if (**line == '>')
+			com->add_out = !ft_strncmp(*line, ">>", 2) ? 1 : 0;
 		*line = com->add_out == 1 ? *line + 2 : *line + 1;
 		*line = ft_skip_spaces(*line);
-		if (set_arg_to_strs(line, envvar, need) == KO)
+		if (set_arg_to_strs(line, envvar, redir) == KO)
 			com->message = ft_strdup(MALLOC_ERROR);
-		else if (ft_strlen(need->arr[need->i - 1]) == 0)
-		{
+		else if (ft_strlen(redir->arr[redir->i - 1]) == 0)
 			if (**line != '\n' && isspecial(*line))
 				com->message = get_unexpect_token_message(**line);
 			else
 				com->message = ft_strdup(REDIR_ERROR);
-		}
+		else if (try_set_fd(redir, fd, com->add_out) == KO)
+			com->message = get_errno_message(redir->arr[redir->i - 1]);
 	}
 	else if (set_arg_to_strs(line, envvar, &com->argv) == KO)
 		com->message = ft_strdup(MALLOC_ERROR);
@@ -69,9 +72,9 @@ t_comand	*init_comand(void)
 
 	if (!(com = (t_comand *)ft_calloc(1, sizeof(t_comand))))
 		return (0);
-	if (init_strs(&com->argv) == KO ||
-		init_strs(&com->redir_in) == KO ||
-		init_strs(&com->redir_out) == KO)
+	if (init_strs(&com->argv, ARGV_MARKER) == KO ||
+		init_strs(&com->redir_in, REDIR_IN_MARKER) == KO ||
+		init_strs(&com->redir_out, REDIR_UOT_MARKER) == KO)
 	{
 		free_comand(com);
 		return (0);
