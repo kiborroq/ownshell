@@ -6,7 +6,7 @@
 /*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/23 16:57:40 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/01/29 23:34:54 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/02/02 12:43:24 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,4 +64,21 @@ void	print_prompt(char **envvar)
 	ft_putstr_fd("minishell:", STDERR_FILENO);
 	ft_putstr_fd(get_env(envvar, "PWD", 1), STDERR_FILENO);
 	ft_putstr_fd("$ ", STDERR_FILENO);
+}
+
+int		print_syntax_error(char token)
+{
+	ft_putstr_fd("minishell: ", STDERR_FILENO);
+	ft_putstr_fd(UNEXPECTED_TOKEN, STDERR_FILENO);
+	if (token)
+	{
+		ft_putchar_fd('`', STDERR_FILENO);
+		ft_putchar_fd(token, STDERR_FILENO);
+		ft_putchar_fd('`', STDERR_FILENO);
+	}
+	else
+		ft_putstr_fd("`newline`", STDERR_FILENO);
+	ft_putchar_fd('\n', STDERR_FILENO);
+	g_shell.exit_status = SYNTAX_CODE;
+	return (KO);
 }

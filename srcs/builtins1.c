@@ -114,7 +114,7 @@ int		exec_exit(char *pathname, char **argv, char ***envvar)
 	int		exit_status;
 
 	(void)envvar;
-	ft_putendl_fd("exit", 1);
+	ft_putendl_fd("exit", 2);
 	exit_status = argv[1] ? ft_atoi(argv[1]) : g_shell.exit_status;
 	if (argv[1] && argv[2])
 		exit_status = print_error(pathname, "too many arguments", 0);
@@ -122,6 +122,8 @@ int		exec_exit(char *pathname, char **argv, char ***envvar)
 	(argv[1][0] == '-' && ft_isdigit_str(argv[1] + 1))))
 		exit_status = 254 + print_error(pathname, argv[1],
 		"numeric argument required");
+	else if (argv[1] && !ft_strcmp(argv[1], "-9223372036854775808"))
+		exit_status = 0;
 	else if ((!exit_status || exit_status == -1) && argv[1]
 	&& ft_strlen(argv[1]) > 2)
 		exit_status = 254 + print_error(pathname, argv[1],

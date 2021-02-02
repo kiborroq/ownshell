@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aronin <aronin@student.21-school.ru>       +#+  +:+       +#+        */
+/*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/11 10:59:31 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/01/30 21:24:45 by aronin           ###   ########.fr       */
+/*   Updated: 2021/02/02 12:55:16 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,7 +109,7 @@ void			redir_parsing(char **line, char **envvar, t_comand *com);
 void			set_next_arg(char **line, char **envvar, t_strs *strs);
 char			*get_arg(char **line, char **envvar, int type);
 int				try_set_fd(t_strs *files, int *fd, int add_out);
-void			check_after(char **line, t_comand *com);
+void			treat_commandend(char **line, t_comand *com);
 
 /*
 **parsing_getcontent.c - functions for $"'\ treating during comand parsing
@@ -195,6 +195,7 @@ char			*get_unexpect_token_message(char c);
 char			*get_errno_message(char *prefix);
 int				print_error(const char *s1, const char *s2, const char *s3);
 void			print_prompt(char **envvar);
+int				print_syntax_error(char token);
 
 /*
 **utils.c - functions for minishell help
@@ -208,6 +209,12 @@ char			**sort_az(char **envvar, int swaps, int i);
 */
 
 int				get_next_line(int fd, char **line);
+
+/*
+**check_line.c - functions to check line for syntax errors
+*/
+
+int				check_line(char *line, int redir_before, int pipe_before);
 
 t_minishell g_shell;
 

@@ -6,7 +6,7 @@
 /*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/23 16:57:40 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/02/01 22:47:25 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/02/02 14:39:35 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,8 +42,6 @@ void	do_allcomands(char *line, char ***envvar, t_comand **com)
 		if ((*com)->message != 0)
 			print_error((*com)->message, 0, 0);
 		free_comand(com);
-		if (g_shell.exit_status == SYNTAX_CODE)
-			break ;
 	}
 }
 
@@ -94,7 +92,8 @@ int		main(int argc, char **argv, char **envp)
 		g_shell.pid = 0;
 		print_prompt(g_shell.envvar);
 		get_nl_and_treat_eof(&line);
-		do_allcomands(line, &g_shell.envvar, &g_shell.com);
+		if (check_line(line, 0, 0) == OK)
+			do_allcomands(line, &g_shell.envvar, &g_shell.com);
 		ft_freeptr((void **)&line);
 	}
 	return (0);

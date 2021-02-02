@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipes_redirs.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aronin <aronin@student.21-school.ru>       +#+  +:+       +#+        */
+/*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/12 10:34:57 by aronin            #+#    #+#             */
-/*   Updated: 2021/02/01 21:22:35 by aronin           ###   ########.fr       */
+/*   Updated: 2021/02/02 11:30:24 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,19 +30,19 @@ void	child_process(t_comand *com, char ***envvar, int *old_fds, int *new_fds)
 {
 	if (com->pipe_before)
 	{
-		if (com->fd_in == STDIN_FILENO && !com->message)
+		if (com->fd_in == STDIN_FILENO)
 			dup2(old_fds[0], STDIN_FILENO);
 		close(old_fds[0]);
 		close(old_fds[1]);
 	}
-	if (com->pipe_after && !com->message)
+	if (com->pipe_after)
 	{
 		if (com->fd_out == STDOUT_FILENO)
 			dup2(new_fds[1], STDOUT_FILENO);
 		close(new_fds[0]);
 		close(new_fds[1]);
 	}
-	exit(com->message ? 2 :
+	exit((com->message || !com->argv.arr[0]) ? (com->message != NULL) :
 	run_command(com->argv.arr[0], com->argv.arr, envvar));
 }
 
@@ -51,7 +51,7 @@ int		handle_pipe2(t_comand *com, char ***envvar, pid_t *pid)
 	static int	old_fds[2];
 	static int	new_fds[2];
 
-	if (com->pipe_after && !com->message)
+	if (com->pipe_after)
 		pipe(new_fds);
 	if (!(*pid = fork()))
 		child_process(com, envvar, old_fds, new_fds);
@@ -92,6 +92,7 @@ int		pipe_redir_run(t_comand *com, char ***envvar)
 {
 	int	status;
 
+	status = 0;
 	if (!com->message)
 	{
 		dup2(com->fd_in, STDIN_FILENO);
@@ -99,9 +100,9 @@ int		pipe_redir_run(t_comand *com, char ***envvar)
 	}
 	if (com->pipe_before || com->pipe_after)
 		status = handle_pipe(com, envvar);
-	else
+	else if (com->argv.arr[0])
 		status = run_command(com->argv.arr[0], com->argv.arr, envvar);
 	dup2(g_shell.save_fds[0], STDIN_FILENO);
 	dup2(g_shell.save_fds[1], STDOUT_FILENO);
-	return (status + (com->message ? 256 : 0));
+	return (status);
 }

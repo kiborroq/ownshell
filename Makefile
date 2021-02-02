@@ -32,7 +32,8 @@ SRCS		= ${SRCS_DIR}main.c \
 			${SRCS_DIR}builtins2.c \
 			${SRCS_DIR}pipes_redirs.c \
 			${SRCS_DIR}get_next_line.c \
-			${SRCS_DIR}catch_sig.c
+			${SRCS_DIR}catch_sig.c \
+			${SRCS_DIR}check_line.c
 
 OBJS		= ${SRCS:.c=.o}
 
