@@ -6,7 +6,7 @@
 /*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/23 16:57:40 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/01/26 18:08:41 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/01/30 12:02:51 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,10 @@ char	*get_1quots_content(char **line)
 	char	*content;
 	char	*begin;
 
+	content = 0;
 	i = 0;
 	begin = *line;
-	while (**line && **line != '\'' && **line != '\n')
+	while (**line && **line != '\'')
 	{
 		(*line)++;
 		i++;
@@ -34,14 +35,17 @@ char	*get_1quots_content(char **line)
 char	*get_mask_content(char **line, int type)
 {
 	char	*content;
+	char	*curr;
 
-	if (line[0][1] == '\n' || line[0][1] == '\0')
+	content = 0;
+	curr = *line;
+	if (curr[1] == '\0')
 		content = ft_strdup("");
-	else if (type == IN_QOUTS && (line[0][1] == '\'' || !isprotect(line[0][1])))
-		content = ft_strndup(*line, 2);
+	else if (type == IN_QOUTS && (curr[1] == '\'' || !isprotect(line[0][1])))
+		content = ft_strndup(curr, 2);
 	else
-		content = ft_strndup(*line + 1, 1);
-	*line = *line[1] == '\0' ? *line + 1 : *line + 2;
+		content = ft_strndup(curr + 1, 1);
+	*line = curr[1] == '\0' ? curr + 1 : curr + 2;
 	return (content);
 }
 
@@ -50,10 +54,10 @@ char	*get_other_content(char **line, int type)
 	char	*content;
 	char	*begin;
 
+	content = 0;
 	begin = *line;
 	if (type == IN_QOUTS)
-		while (**line && **line != '\n' &&
-				(**line == '\'' || !isprotect(**line)))
+		while (**line && (**line == '\'' || !isprotect(**line)))
 			(*line)++;
 	else
 		while (**line && !ft_isspace(**line) &&
@@ -63,29 +67,31 @@ char	*get_other_content(char **line, int type)
 	return (content);
 }
 
-char	*get_env_content(char **line, char **envvar)
+char	*get_env_content(char **line, char **envvar, int type)
 {
 	char	*begin;
 	char	*env_name;
 	char	*content;
 
+	content = 0;
 	begin = *line;
 	while (ft_isalnum(**line) || **line == '_')
 		(*line)++;
 	if (*line > begin)
 	{
-		if (!(env_name = ft_strndup(begin, *line - begin)))
-			return (0);
+		env_name = ft_strndup(begin, *line - begin);
 		content = get_env(envvar, env_name, 1);
-		content = content == 0 ? ft_strdup("") : ft_strdup(content);
+		content = content == 0 ? 0 : ft_strdup(content);
 		free(env_name);
 	}
 	else if (**line == '?')
 	{
-		content = ft_itoa(0); // заменить на exit_code
+		content = ft_itoa(g_shell.exit_status);
 		(*line)++;
 	}
-	else
+	else if (type == IN_QOUTS)
+		content = ft_strdup("$");
+	else if (*begin != '\'' && *begin != '"')
 		content = ft_strdup("$");
 	return (content);
 }
@@ -96,16 +102,13 @@ char	*get_2quots_content(char **line, char **envvar)
 	char	*arg;
 
 	content = 0;
-	while (**line && **line != '\n' && **line != '"')
+	while (**line && **line != '"')
 	{
-		if (!(arg = get_arg(line, envvar, IN_QOUTS)))
-		{
-			ft_freeptr((void **)&content);
-			return (0);
-		}
-		if (!(content = ft_strjoin_wrap(content, arg)))
-			return (0);
+		arg = get_arg(line, envvar, IN_QOUTS);
+		content = ft_strjoin_wrap(content, arg);
 	}
 	*line = **line == '"' ? *line + 1 : *line;
+	if (content == 0)
+		content = ft_strdup("");
 	return (content);
 }

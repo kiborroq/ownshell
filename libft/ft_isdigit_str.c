@@ -1,32 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strjoin_three.c                                 :+:      :+:    :+:   */
+/*   ft_isdigit_str.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: aronin <aronin@student.21-school.ru>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/09/17 17:19:23 by aronin            #+#    #+#             */
-/*   Updated: 2021/01/30 02:20:05 by aronin           ###   ########.fr       */
+/*   Created: 2020/11/02 16:18:11 by kiborroq          #+#    #+#             */
+/*   Updated: 2021/01/30 01:14:37 by aronin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-char	*ft_strjoin_three(char const *s1, char const *s2, char const *s3)
+int	ft_isdigit_str(char *str)
 {
-	char	*str_cons;
-	char	*str_cons0;
-
-	if (!s1 || !s2 || !s3 || !(str_cons0 = malloc((ft_strlen(s1) +
-	ft_strlen(s2) + ft_strlen(s3) + 1) * sizeof(char))))
-		return (NULL);
-	str_cons = str_cons0;
-	while (*s1)
-		*str_cons++ = *s1++;
-	while (*s2)
-		*str_cons++ = *s2++;
-	while (*s3)
-		*str_cons++ = *s3++;
-	*str_cons = 0;
-	return (str_cons0);
+	while (*str)
+	{
+		if (!ft_isdigit(*str++))
+			return (0);
+	}
+	return (1);
 }

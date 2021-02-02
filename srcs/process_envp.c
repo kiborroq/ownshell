@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   process_envp.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
+/*   By: aronin <aronin@student.21-school.ru>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/12 10:34:57 by aronin            #+#    #+#             */
-/*   Updated: 2021/01/28 10:33:50 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/02/01 18:57:20 by aronin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ char	**realloc_envvar(char ***envvar_old)
 
 	g_env_num += 100;
 	i = 0;
-	envvar_new = malloc(g_env_num * sizeof(char *));
+	envvar_new = (char **)ft_calloc(g_env_num, sizeof(char *));
 	while ((*envvar_old)[i])
 	{
 		envvar_new[i] = ft_strdup((*envvar_old)[i]);
@@ -84,9 +84,13 @@ int		get_env_index(char **envvar, char *target_key)
 	int		index;
 	char	*index_str;
 
+	index = -1;
 	if (!(index_str = get_env(envvar, target_key, 2)))
-		return (-1);
-	index = ft_atoi(index_str);
+	{
+		while (envvar[++index])
+			;
+	}
+	index = (index < 0 ? ft_atoi(index_str) : index);
 	free(index_str);
 	return (index);
 }

@@ -6,11 +6,20 @@
 /*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/23 16:57:40 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/01/28 02:10:39 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/01/29 10:00:47 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/minishell.h"
+
+void	print_strs(char **strs)
+{
+	while (*strs)
+	{
+		ft_printf("|%s|\n", *strs);
+		strs++;
+	}
+}
 
 int		strs_size(char **strs)
 {
@@ -26,6 +35,8 @@ void	free_strs(char **strs)
 {
 	int	i;
 
+	if (!strs)
+		return ;
 	i = 0;
 	while (strs[i])
 	{
@@ -42,8 +53,8 @@ char	**realloc_strs(char **old_strs)
 	int		size;
 
 	i = 0;
-	size = old_strs ? strs_size(old_strs) : 0;
-	if (!(new_strs = ft_calloc(size * 2 + 1, sizeof(char *))))
+	size = old_strs ? strs_size(old_strs) * 2 + 1 : 0;
+	if (!(new_strs = ft_calloc(size, sizeof(char *))))
 	{
 		free_strs(old_strs);
 		return (0);

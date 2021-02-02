@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
+/*   By: kiborroq <kiborroq@student.21-school.ru>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/09 12:23:53 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/01/27 12:04:46 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/02/01 23:24:00 by aronin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,32 +49,6 @@ static char	*get_line(char *save, size_t to_lb)
 	return (l);
 }
 
-static char	*trim_save(char *save, size_t to_lb)
-{
-	size_t	s_len;
-	char	*s;
-	size_t	n;
-
-	if (!save)
-		return (0);
-	if (!save[to_lb])
-	{
-		free(save);
-		return (0);
-	}
-	s_len = ft_strlen(save);
-	n = s_len - to_lb;
-	if (!(s = (char *)malloc(n * sizeof(size_t))))
-	{
-		free(save);
-		return (0);
-	}
-	ft_memcpy(s, save + to_lb + 1, n - 1);
-	s[n - 1] = '\0';
-	free(save);
-	return (s);
-}
-
 int			get_next_line(int fd, char **line)
 {
 	char		*buf;
@@ -97,8 +71,8 @@ int			get_next_line(int fd, char **line)
 	free(buf);
 	if (readed == -1 || !(*line = get_line(save, to_lb)))
 		return (-1);
-	if (!(save = trim_save(save, to_lb)) && readed)
-		return (-1);
+	free(save);
+	save = NULL;
 	if (readed == 0)
 		return (0);
 	return (1);

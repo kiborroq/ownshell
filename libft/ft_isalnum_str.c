@@ -6,7 +6,7 @@
 /*   By: aronin <aronin@student.21-school.ru>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/12 10:34:57 by aronin            #+#    #+#             */
-/*   Updated: 2020/09/12 12:07:02 by aronin           ###   ########.fr       */
+/*   Updated: 2021/01/29 23:31:01 by aronin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,8 @@ int	ft_isalnum_str(char *str)
 {
 	while (*str)
 	{
-		if (!(*str >= 'A' && *str <= 'Z') && !(*str >= 'a' && *str <= 'z')
-		&& !(*str >= '0' && *str <= '9'))
+		if (!ft_isalnum(*str++))
 			return (0);
-		str++;
 	}
 	return (1);
 }

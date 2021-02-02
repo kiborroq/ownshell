@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
+/*   By: aronin <aronin@student.21-school.ru>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/11 10:59:31 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/01/28 10:34:03 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/01/30 21:24:45 by aronin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,9 @@
 # include <dirent.h>
 # include <string.h>
 # include <fcntl.h>
-# include <sys/types.h>
 # include <sys/wait.h>
+# include <signal.h>
+# include <limits.h>
 
 # define KO -1
 # define OK 1
@@ -36,23 +37,17 @@
 # define REDIR_IN_MARKER 2
 # define REDIR_UOT_MARKER 3
 
-// # define PATH_MAX 1024
-
-# define UNEXPECTED_TOKEN "minishell: syntax error near unexpected token "
-# define REDIR_ERROR "minishell: syntax error near unexpected token 'newline'"
+# define UNEXPECTED_TOKEN "syntax error near unexpected token "
+# define REDIR_ERROR "syntax error near unexpected token `newline`"
 # define MALLOC_ERROR "malloc error"
+# define EXIT_MESSAGE "exit"
 
-typedef	struct	s_fds
-{
-	int			before_fd[2];
-	int			after_fd[2];
-	int			fd_in;
-	int			fd_uot;
-	int			save_fd_in;
-	int			save_fd_uot;
-	int			status_in;
-	int			status_out;
-}				t_fds;
+# define SIGQUIT_CODE 131
+# define SIGINT_CODE 130
+# define SIGSEGV_CODE 139
+# define STDEXIT_CODE 0
+# define SYNTAX_CODE 258
+# define FD_CODE 1
 
 typedef struct	s_strs
 {
@@ -76,15 +71,42 @@ typedef struct	s_comand
 	char		*message;
 }				t_comand;
 
+typedef	struct	s_minishell
+{
+	t_comand	*com;
+	char		**envvar;
+	pid_t		pid;
+	int			exit_status;
+	int			save_fds[2];
+}				t_minishell;
+
 /*
-**comand_parsing_1.c and _2.c - structure of bash command parsing
+**main.c - common structure of project minishell
+*/
+
+int				main(int argc, char **argv, char **envp);
+void			init_minishell(char **envp);
+void			get_nl_and_treat_eof(char **line);
+void			do_allcomands(char *line, char ***envvar, t_comand **com);
+void			exit_minishell(char *message);
+
+/*
+**catch_sig.c - functions for catching and correctly treating signals
+*/
+
+void			catch_sigint(int sign);
+void			catch_sigquit(int sign);
+void			catch_sigsegv(int sign);
+
+/*
+**comand_parsing1.c and 2.c - fuctions for bash command parsing
 */
 
 t_comand		*get_next_comand(char **line, char **envvar);
 t_comand		*init_comand(void);
 int				check_before(char **line, t_comand *com);
-int				set_next_arg(char **line, char **envvar, t_comand *com);
-int				set_arg_to_strs(char **line, char **envvar, t_strs *strs);
+void			redir_parsing(char **line, char **envvar, t_comand *com);
+void			set_next_arg(char **line, char **envvar, t_strs *strs);
 char			*get_arg(char **line, char **envvar, int type);
 int				try_set_fd(t_strs *files, int *fd, int add_out);
 void			check_after(char **line, t_comand *com);
@@ -96,7 +118,7 @@ void			check_after(char **line, t_comand *com);
 char			*get_2quots_content(char **line, char **envvar);
 char			*get_1quots_content(char **line);
 char			*get_mask_content(char **line, int type);
-char			*get_env_content(char **line, char **envvar);
+char			*get_env_content(char **line, char **envvar, int type);
 char			*get_other_content(char **line, int type);
 
 /*
@@ -107,31 +129,43 @@ int				isprotect(char ch);
 int				isredirect(char *str);
 int				iscomandend(char ch);
 int				isspecial(char *str);
-void			free_comand(t_comand *com);
+void			free_comand(t_comand **com);
 
 /*
-**do_with_strs.c - functions for working with strs
+**pipes_redirs.c - functions to process pipes
 */
 
-int				strs_size(char **strs);
-void			free_strs(char **strs);
-char			**realloc_strs(char **old_strs);
-int				init_strs(t_strs *new, int marker);
+int				pipe_redir_run(t_comand *com, char ***envvar);
+int				handle_pipe(t_comand *com, char ***envvar);
+int				handle_pipe2(t_comand *com, char ***envvar, pid_t *pid);
+void			parent_process(t_comand *com, int *old_fds, int *new_fds);
+void			child_process(t_comand *com, char ***envvar,
+								int *old_fds, int *new_fds);
 
 /*
-**error_message_treat.c - functions for error messages creation
+**exec_commands.c - functions for command execution (both builtin and external)
 */
 
-char			*get_unexpect_token_message(char c);
-char			*get_errno_message(char *prefix);
+int				run_command(char *pathname, char **argv, char ***envvar);
+int				find_builtin(char *pathname);
+char			*append_dir(char *pathname, char **envvar);
 
 /*
-**utils.c - functions for minishell help
+**builtins1.c - builtin commands part1
 */
 
-char			*ft_strjoin_wrap(char *s1, char *s2);
-char			**sort_az(char **envvar, int swaps, int i);
-int				print_error(const char *s1, const char *s2, const char *s3);
+int				exec_echo(char *pathname, char **argv, char ***envvar);
+int				exec_pwd(char *pathname, char **argv, char ***envvar);
+int				exec_cd(char *pathname, char **argv, char ***envvar);
+int				exec_exit(char *pathname, char **argv, char ***envvar);
+
+/*
+**builtins2.c - builtin commands part 2
+*/
+
+int				exec_env(char *pathname, char **argv, char ***envvar);
+int				exec_export(char *pathname, char **argv, char ***envvar);
+int				exec_unset(char *pathname, char **argv, char ***envvar);
 
 /*
 **process_envp.c - functions for enviroment variables treating
@@ -144,41 +178,37 @@ char			**read_envp(char **envp);
 char			**realloc_envvar(char ***envvar_old);
 
 /*
-**exec_commands.c - functions for command execution (both builtin and external)
+**do_with_strs.c - functions for working with strs
 */
 
-int				run_command(char *pathname, char **argv, char ***envvar);
-int				find_builtin(char *pathname);
-char			*append_dir(char **pathname, char **envvar);
+int				strs_size(char **strs);
+void			free_strs(char **strs);
+char			**realloc_strs(char **old_strs);
+int				init_strs(t_strs *new, int marker);
+void			print_strs(char **strs);
 
 /*
-**builtins1.c - builtin commands part1
+**message_treat.c - functions for error messages creation
 */
 
-int				exec_echo(char *pathname, char **argv, char ***envvar);
-int				exec_pwd(char *pathname, char **argv, char ***envvar);
-int				exec_cd(char *pathname, char **argv, char ***envvar);
+char			*get_unexpect_token_message(char c);
+char			*get_errno_message(char *prefix);
+int				print_error(const char *s1, const char *s2, const char *s3);
+void			print_prompt(char **envvar);
 
 /*
-**builtins2.c - builtin commands part 2
+**utils.c - functions for minishell help
 */
 
-int				exec_env(char *pathname, char **argv, char ***envvar);
-int				exec_export(char *pathname, char **argv, char ***envvar);
-int				exec_unset(char *pathname, char **argv, char ***envvar);
-int				exec_exit(char *pathname, char **argv, char ***envvar);
-
-/*
-**pipes.c - functions to process pipes
-*/
-
-int				handle_pipe(t_comand *com, char ***envvar);
-
+char			*ft_strjoin_wrap(char *s1, char *s2);
+char			**sort_az(char **envvar, int swaps, int i);
 
 /*
 **get_next_line.c - func that get every line in current fd
 */
 
 int				get_next_line(int fd, char **line);
+
+t_minishell g_shell;
 
 #endif

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_command.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aronin <kiborroq@kiborroq.42.fr>           +#+  +:+       +#+        */
+/*   By: aronin <aronin@student.21-school.ru>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/12 10:34:57 by aronin            #+#    #+#             */
-/*   Updated: 2021/01/26 10:19:10 by aronin           ###   ########.fr       */
+/*   Updated: 2021/01/31 18:55:29 by aronin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ int		find_builtin(char *pathname)
 	return (-1);
 }
 
-char	*append_dir(char **pathname, char **envvar)
+char	*append_dir(char *pathname, char **envvar)
 {
 	char				**dirlist;
 	char				*temp;
@@ -40,19 +40,17 @@ char	*append_dir(char **pathname, char **envvar)
 	file_not_found = 1;
 	dirlist = ft_split(get_env(envvar, "PATH", 1), ':');
 	i = -1;
-	while (file_not_found && dirlist[++i])
+	while (file_not_found && dirlist && dirlist[++i])
 	{
-		temp = ft_strjoin_three(dirlist[i], "/", *pathname);
+		temp = ft_strjoin_three(dirlist[i], "/", pathname);
 		free(dirlist[i]);
 		file_not_found = stat(temp, statbuf);
 		free(file_not_found ? temp : NULL);
 	}
-	while (!file_not_found && dirlist[++i])
+	while (!file_not_found && dirlist && dirlist[++i])
 		free(dirlist[i]);
 	free(dirlist);
-	file_not_found ? print_error("minishell", "command not found",
-	*pathname) : 0;
-	free(*pathname);
+	file_not_found ? print_error(pathname, "command not found", 0) : 0;
 	return (file_not_found ? NULL : temp);
 }
 
@@ -62,23 +60,25 @@ int		run_command(char *pathname, char **argv, char ***envvar)
 					char ***envvar) = {exec_echo, exec_cd, exec_pwd,
 					exec_export, exec_unset, exec_env, exec_exit};
 	int				index;
-	pid_t			pid;
 	int				exit_status;
+	char			*pathname_wdir;
 
 	exit_status = 127;
 	if ((index = find_builtin(pathname)) >= 0)
 		exit_status = run_builtin[index](pathname, argv, envvar);
-	else if (ft_strchr(pathname, '/') || (pathname =
-	append_dir(&pathname, *envvar)))
+	else if ((ft_strchr(pathname, '/') && !(pathname_wdir = NULL)) ||
+	(pathname_wdir = append_dir(pathname, *envvar)))
 	{
-		if (!(pid = fork()))
+		if (!(g_shell.pid = fork()))
 		{
-			execve(pathname, argv, *envvar);
-			print_error("minishell", strerror(errno), pathname);
-			exit(1);
+			execve(pathname_wdir ? pathname_wdir : pathname, argv, *envvar);
+			exit(print_error(strerror(errno), pathname, 0));
 		}
-		pid > 0 ? waitpid(pid, &exit_status, 0) :
-		(exit_status = print_error("minishell", "fork failed", 0));
+		g_shell.pid > 0 ? waitpid(g_shell.pid, &exit_status, 0) :
+		(exit_status = print_error("fork failed", 0, 0) + 255);
+		exit_status /= (!(exit_status == 2 || exit_status == 3) ? 256 : 1);
+		free(pathname_wdir);
 	}
-	return (exit_status);
+	return (exit_status + ((exit_status == 2 || exit_status == 3)
+	? 128 : 0));
 }

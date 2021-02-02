@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   libft.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
+/*   By: aronin <aronin@student.21-school.ru>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/04 11:08:03 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/01/15 13:26:58 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/01/30 01:31:39 by aronin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,6 +147,7 @@ long				ft_putstr_advanced(char *s, char vartype, int precision,
 					int maxlen);
 int					max(int a, int b, int c);
 int					ft_isalnum_str(char *str);
+int					ft_isdigit_str(char *str);
 char				*ft_strupcase(char *str);
 char				*ft_strlowcase(char *str);
 char				*ft_strjoin_three(char const *s1, char const *s2,

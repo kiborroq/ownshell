@@ -63,6 +63,7 @@ SRCS		= ft_memset.c\
 			ft_printf3.c \
 			ft_printf4.c \
 			ft_isalnum_str.c \
+			ft_isdigit_str.c \
 			ft_strupcase.c \
 			ft_strlowcase.c \
 			ft_strjoin_three.c

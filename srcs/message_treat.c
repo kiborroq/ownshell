@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   error_message_treat.c                              :+:      :+:    :+:   */
+/*   message_treat.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/23 16:57:40 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/01/26 14:15:50 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/01/29 23:34:54 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,4 +39,29 @@ char	*get_errno_message(char *prefix)
 	message = ft_strjoin(tmp, strerror(errno));
 	free(tmp);
 	return (message);
+}
+
+int		print_error(const char *s1, const char *s2, const char *s3)
+{
+	ft_putstr_fd("minishell: ", 2);
+	ft_putstr_fd((char *)s1, 2);
+	if (s2)
+	{
+		ft_putstr_fd(": ", 2);
+		ft_putstr_fd((char *)s2, 2);
+	}
+	if (s3)
+	{
+		ft_putstr_fd(": ", 2);
+		ft_putstr_fd((char *)s3, 2);
+	}
+	ft_putstr_fd("\n", 2);
+	return (1);
+}
+
+void	print_prompt(char **envvar)
+{
+	ft_putstr_fd("minishell:", STDERR_FILENO);
+	ft_putstr_fd(get_env(envvar, "PWD", 1), STDERR_FILENO);
+	ft_putstr_fd("$ ", STDERR_FILENO);
 }

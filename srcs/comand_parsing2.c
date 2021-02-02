@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   comand_parsing_2.c                                 :+:      :+:    :+:   */
+/*   comand_parsing2.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/23 16:57:40 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/01/26 18:07:28 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/02/01 19:24:27 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,8 @@
 
 int		try_set_fd(t_strs *files, int *fd, int add_out)
 {
-	if (*fd > 0)
+	if ((files->marker == REDIR_UOT_MARKER && *fd != STDOUT_FILENO) ||
+		(files->marker == REDIR_IN_MARKER && *fd != STDIN_FILENO))
 		close(*fd);
 	if (files->marker == REDIR_UOT_MARKER && add_out == 1)
 		*fd = open(files->arr[files->i - 1], O_CREAT | O_RDWR | O_APPEND,
@@ -24,7 +25,12 @@ int		try_set_fd(t_strs *files, int *fd, int add_out)
 										S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 	else
 		*fd = open(files->arr[files->i - 1], O_RDONLY);
-	return (*fd < 0 ? KO : OK);
+	if (*fd < 0)
+	{
+		g_shell.exit_status = FD_CODE;
+		return (KO);
+	}
+	return (OK);
 }
 
 char	*get_arg(char **line, char **envvar, int type)
@@ -44,7 +50,7 @@ char	*get_arg(char **line, char **envvar, int type)
 	else if (**line == '$')
 	{
 		(*line)++;
-		arg = get_env_content(line, envvar);
+		arg = get_env_content(line, envvar, type);
 	}
 	else if (**line == '\\')
 		arg = get_mask_content(line, type);
@@ -53,26 +59,25 @@ char	*get_arg(char **line, char **envvar, int type)
 	return (arg);
 }
 
-int		set_arg_to_strs(char **line, char **envvar, t_strs *strs)
+void	set_next_arg(char **line, char **envvar, t_strs *strs)
 {
 	char	*arg;
 
+	arg = 0;
+	*line = ft_skip_spaces(*line);
 	while (**line && !ft_isspace(**line) && !isspecial(*line))
 	{
+		if (strs->i >= strs->size)
+		{
+			strs->arr = realloc_strs(strs->arr);
+			strs->size *= 2;
+		}
 		if ((arg = get_arg(line, envvar, 0)) != 0)
 		{
 			arg = ft_strjoin_wrap(strs->arr[strs->i], arg);
-			if (arg != 0 && strs->i >= strs->size)
-			{
-				if (!(strs->arr = realloc_strs(strs->arr)))
-					return (KO);
-				strs->size *= 2;
-			}
 			strs->arr[strs->i] = arg;
 		}
-		if (arg == 0)
-			return (KO);
 	}
-	strs->i++;
-	return (OK);
+	if (strs->arr[strs->i] != 0)
+		strs->i++;
 }

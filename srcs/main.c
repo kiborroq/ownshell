@@ -6,214 +6,96 @@
 /*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/23 16:57:40 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/01/28 10:40:56 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/02/01 22:47:25 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-
 #include "../incs/minishell.h"
 
-void	print_strs(char **strs)
+void	exit_minishell(char *message)
 {
-	while (*strs)
+	if (message)
 	{
-		printf("|%s|\n", *strs);
-		strs++;
+		ft_putstr_fd(message, STDERR_FILENO);
+		ft_putstr_fd("\n", STDERR_FILENO);
 	}
+	free_comand(&g_shell.com);
+	free_strs(g_shell.envvar);
+	close(g_shell.save_fds[0]);
+	close(g_shell.save_fds[1]);
+	exit(g_shell.exit_status);
 }
 
-int		set_fds_and_run(t_comand *com, char ***envvar, t_fds *fds)
+void	do_allcomands(char *line, char ***envvar, t_comand **com)
 {
-	int	status_in;
-	int	status_out1;
-	int	status_out2;
-
-	status_in = 0;
-	status_out1 = 0;
-	status_out2 = 0;
-	fds->save_fd_in = dup(STDIN_FILENO);
-	fds->save_fd_uot = dup(STDOUT_FILENO);
-	if (com->pipe_before == 1 && com->fd_in == 0)
-	{
-		dup2(fds->before_fd[0], STDIN_FILENO);
-		status_in = 1;
-	}
-	else if (com->fd_in > 0)
-	{
-		if (com->pipe_before == 1)
-			close(fds->before_fd[0]);
-		dup2(com->fd_in, STDIN_FILENO);
-		status_in = 2;
-	}
-	if (com->pipe_after == 1)
-	{
-		pipe(fds->after_fd);
-		dup2(fds->after_fd[1], STDOUT_FILENO);
-		status_out1 = 3;
-		if (com->fd_out > 0)
-		{
-			close(fds->after_fd[1]);
-			status_out1 = 0;
-		}
-	}
-	if (com->fd_out > 0)
-	{
-		dup2(com->fd_out, STDOUT_FILENO);
-		status_out2 = 4;
-	}
-	run_command(com->argv.arr[0], com->argv.arr, envvar);
-	if (status_in == 1)
-		close(fds->before_fd[0]);
-	else if (status_in == 2)
-		close(com->fd_in);
-	if (status_out1 == 3)
-		close(fds->after_fd[1]);
-	else if (status_out2 == 4)
-		close(com->fd_out);
-	dup2(fds->save_fd_in, STDIN_FILENO);
-	close(fds->save_fd_in);
-	dup2(fds->save_fd_uot, STDOUT_FILENO);
-	close(fds->save_fd_uot);
-	fds->before_fd[0] = fds->after_fd[0];
-	fds->before_fd[1] = fds->after_fd[1];
-	return (KO);
-}
-
-void	init_fds(t_fds *fds)
-{
-	fds->after_fd[0] = 0;
-	fds->after_fd[1] = 0;
-	fds->before_fd[0] = 0;
-	fds->before_fd[1] = 0;
-	fds->fd_in = 0;
-	fds->fd_uot = 0;
-	fds->save_fd_in = 0;
-	fds->save_fd_uot = 0;
-	fds->status_in = 0;
-	fds->status_out = 0;
-}
-
-int		do_allcomands(char *line, char ***envvar)
-{
-	t_comand	*com = 0;
-	t_fds		fds;
 	int	pipe_before;
 
 	pipe_before = 0;
-	init_fds(&fds);
 	line = ft_skip_spaces(line);
-	if (ft_strlen(line) == 0)
-		return (OK);
-	while (*line && *line != '\n')
+	while (*line)
 	{
-		com = get_next_comand(&line, *envvar);
-		if (com == 0)
-			return (KO);
-		if (com->message == 0)
-		{
-			com->pipe_before = pipe_before;
-			set_fds_and_run(com, envvar, &fds);
-			pipe_before = com->pipe_after;
-		}
-		else
-			printf("%s\n", com->message);
-		// free_comand(com); ??????????
+		(*com) = get_next_comand(&line, *envvar);
+		(*com)->pipe_before = pipe_before;
+		pipe_before = (*com)->pipe_after;
+		if (!(*com)->message || (*com)->pipe_after || (*com)->pipe_before)
+			g_shell.exit_status = pipe_redir_run(*com, envvar);
+		if ((*com)->message != 0)
+			print_error((*com)->message, 0, 0);
+		free_comand(com);
+		if (g_shell.exit_status == SYNTAX_CODE)
+			break ;
 	}
-	return (OK);
 }
 
-int main(int argc, char **argv, char **envp)
+void	get_nl_and_treat_eof(char **line)
 {
-	// char	*line = "		echo  $? $ $USER $KK666	 '123''123'\"123\" \"$PATH ; | ' ' \\\" > >> < \\' \" > kk >> gg | cat < Makefile >> lps < gg < \"k\"'p't | echo 123 | echo 3943 ";
+	char	*save;
+	int		status;
+	size_t	len;
+
+	save = 0;
+	while ((status = get_next_line(STDIN_FILENO, line)) == 0)
+	{
+		len = ft_strlen(*line);
+		if (len == 0 && save == 0)
+			exit_minishell(EXIT_MESSAGE);
+		if (len > 0)
+			save = ft_strjoin_wrap(save, *line);
+	}
+	if (status == -1)
+	{
+		g_shell.exit_status = STDEXIT_CODE;
+		exit_minishell(strerror(errno));
+	}
+	*line = ft_strjoin_wrap(save, *line);
+}
+
+void	init_minishell(char **envp)
+{
+	g_shell.com = 0;
+	g_shell.exit_status = 0;
+	g_shell.envvar = read_envp(envp);
+	g_shell.save_fds[0] = dup(STDIN_FILENO);
+	g_shell.save_fds[1] = dup(STDOUT_FILENO);
+	signal(SIGINT, catch_sigint);
+	signal(SIGQUIT, catch_sigquit);
+	signal(SIGSEGV, catch_sigsegv);
+}
+
+int		main(int argc, char **argv, char **envp)
+{
+	char	*line;
+
 	(void)argc;
 	(void)argv;
-	char	*line;
-	char	**envvar;
-
-	envvar = read_envp(envp);
+	init_minishell(envp);
 	while (1)
 	{
-		ft_printf("minishell:%s$ ", get_env(envvar, "PWD", 1));
-		if (get_next_line(0, &line) < 0)
-			break ;
-		do_allcomands(line, &envvar);
+		g_shell.pid = 0;
+		print_prompt(g_shell.envvar);
+		get_nl_and_treat_eof(&line);
+		do_allcomands(line, &g_shell.envvar, &g_shell.com);
 		ft_freeptr((void **)&line);
 	}
-	ft_printf("\n");
 	return (0);
 }
-
-// int		main(int argc, char **argv, char **envp)
-// {
-// 	char	**envvar = read_envp(envp);
-// 	char	**av;
-// 	char	*command = ft_strdup(argv[1]);
-// 	int		j = 0;
-// 	// int		i = 0;
-
-// 	(void)envvar;
-// 	av = (char **)malloc(argc * sizeof(char *));
-// 	while (++j < argc)
-// 		av[j - 1] = ft_strdup(argv[j]);
-// 	run_command(command, av, &envvar);
-// 	run_command(ft_strdup("pwd"), ft_split("pwd", ' '), &envvar);
-// 	run_command(command, ft_split("cd ..", ' '), &envvar);
-// 	run_command(ft_strdup("pwd"), ft_split("pwd", ' '), &envvar);
-// 	///TESTS///////
-// 	if(!ft_strcmp(argv[1], "export") && argc > 2)
-// 		run_command(ft_strdup("env"), ft_split("env", ' '), &envvar);
-// 	if(!ft_strcmp(argv[1], "cd"))
-// 		run_command(ft_strdup("pwd"), ft_split("pwd", ' '), &envvar);
-// 	if((!ft_strcmp(argv[1], "export") && argc > 2) ||
-// 	!ft_strcmp(argv[1], "unset"))
-// 	{
-// 		while (envvar[i])
-// 			ft_printf("%s\n", envvar[i++]);
-// 	}
-// 	return (0);
-// }
-
-// int		main(int argc, char **argv, char **envp)
-// {
-// 	t_comand	com;
-// 	char		**envvar = read_envp(envp);
-
-// 	(void)argc;
-// 	(void)argv;
-// 	com.argv.arr = (char **)malloc(3 * sizeof(char *));
-// 	com.argv.arr[0] = ft_strdup("cat");
-// 	com.argv.arr[1] = ft_strdup("tes");
-// 	com.argv.arr[2] = 0;
-// 	com.pipe_before = 0;
-// 	com.pipe_after = 1;
-// 	handle_pipe(&com, &envvar);
-// 	com.argv.arr = (char **)malloc(3 * sizeof(char *));
-// 	com.argv.arr[0] = ft_strdup("ech");
-// 	com.argv.arr[1] = 0;
-// 	com.argv.arr[2] = 0;
-// 	com.pipe_before = 1;
-// 	com.pipe_after = 0;
-// 	handle_pipe(&com, &envvar);
-// 	// com.argv.arr = (char **)malloc(3 * sizeof(char *));
-// 	// com.argv.arr[0] = ft_strdup("grep");
-// 	// com.argv.arr[1] = ft_strdup("hello ");
-// 	// com.argv.arr[2] = 0;
-// 	// com.pipe_before = 1;
-// 	// com.pipe_after = 0;
-// 	// handle_pipe(&com, &envvar);
-// 	return (0);
-// }
-
-
-
-// printf("argv:\n");
-// print_strs(com->argv.arr);
-// printf("redir_in:\n");
-// print_strs(com->redir_in.arr);
-// printf("redir_out:\n");
-// print_strs(com->redir_out.arr);
-// printf(">> ?: ");
-// printf("%d\n", com->add_out);
-// printf("pipe_after: ");
-// printf("%d\n", com->pipe_after);
-// printf("message: ");

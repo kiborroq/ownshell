@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aronin <kiborroq@kiborroq.42.fr>           +#+  +:+       +#+        */
+/*   By: aronin <aronin@student.21-school.ru>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/12 10:34:57 by aronin            #+#    #+#             */
-/*   Updated: 2021/01/26 02:13:35 by aronin           ###   ########.fr       */
+/*   Updated: 2021/01/30 00:17:10 by aronin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,21 +57,4 @@ char	*ft_strjoin_wrap(char *s1, char *s2)
 		free(s2);
 	}
 	return (new);
-}
-
-int		print_error(const char *s1, const char *s2, const char *s3)
-{
-	ft_putstr_fd((char *)s1, 2);
-	if (s2)
-	{
-		ft_putstr_fd(": ", 2);
-		ft_putstr_fd((char *)s2, 2);
-	}
-	if (s3)
-	{
-		ft_putstr_fd(": ", 2);
-		ft_putstr_fd((char *)s3, 2);
-	}
-	ft_putstr_fd("\n", 2);
-	return (1);
 }
