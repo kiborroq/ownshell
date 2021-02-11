@@ -22,7 +22,7 @@ void	catch_sigint(int sign)
 		print_prompt(g_shell.envvar);
 		g_shell.exit_status = 1;
 	}
-	else if (g_shell.pid > 0 && !g_shell.com->pipe_after)
+	else if (!g_shell.subshell)
 		ft_putstr_fd("\n", STDERR_FILENO);
 }
 
@@ -31,7 +31,7 @@ void	catch_sigquit(int sign)
 	(void)sign;
 	if (!g_shell.pid && !g_shell.com)
 		ft_putstr_fd("\b\b  \b\b", STDERR_FILENO);
-	else if (g_shell.pid > 0 && !g_shell.com->pipe_after)
+	else if (!g_shell.subshell)
 		ft_putstr_fd("Quit: 3\n", STDERR_FILENO);
 }
 

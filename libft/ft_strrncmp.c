@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strrncmp.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
+/*   By: aronin <aronin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 23:10:31 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/01/15 13:35:21 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/02/05 20:14:45 by aronin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,12 @@ int	ft_strrncmp(const char *s1, const char *s2, size_t n)
 
 	s1_len = ft_strlen(s1);
 	s2_len = ft_strlen(s2);
+	if (!s1_len && s2_len)
+		return (0 - *s2);
+	if (!s2_len && s1_len)
+		return (*s1 - 0);
+	if (!s1_len && !s2_len)
+		return (0);
 	diff = 0;
 	i = 0;
 	while (i < n && diff == 0)

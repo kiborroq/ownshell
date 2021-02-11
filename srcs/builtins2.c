@@ -118,7 +118,7 @@ int		exec_unset(char *pathname, char **argv, char ***envvar)
 	exit_status = 0;
 	while (argv[++i])
 	{
-		if ((j = get_env_index(*envvar, argv[i])) < 0)
+		if (!(*envvar)[(j = get_env_index(*envvar, argv[i]))])
 		{
 			if (!check_key(&argv[i], 2))
 				exit_status = print_error(pathname, argv[i],

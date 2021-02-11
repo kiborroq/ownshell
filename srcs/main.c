@@ -42,6 +42,7 @@ void	do_allcomands(char *line, char ***envvar, t_comand **com)
 		if ((*com)->message != 0)
 			print_error((*com)->message, 0, 0);
 		free_comand(com);
+		g_shell.subshell = 0;
 	}
 }
 
@@ -75,6 +76,7 @@ void	init_minishell(char **envp)
 	g_shell.envvar = read_envp(envp);
 	g_shell.save_fds[0] = dup(STDIN_FILENO);
 	g_shell.save_fds[1] = dup(STDOUT_FILENO);
+	g_shell.subshell = 0;
 	signal(SIGINT, catch_sigint);
 	signal(SIGQUIT, catch_sigquit);
 	signal(SIGSEGV, catch_sigsegv);

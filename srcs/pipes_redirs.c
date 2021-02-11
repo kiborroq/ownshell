@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipes_redirs.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
+/*   By: aronin <aronin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/12 10:34:57 by aronin            #+#    #+#             */
-/*   Updated: 2021/02/02 11:30:24 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/02/05 20:14:09 by aronin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ void	child_process(t_comand *com, char ***envvar, int *old_fds, int *new_fds)
 		close(new_fds[1]);
 	}
 	exit((com->message || !com->argv.arr[0]) ? (com->message != NULL) :
-	run_command(com->argv.arr[0], com->argv.arr, envvar));
+	run_command(com, com->argv.arr[0], com->argv.arr, envvar));
 }
 
 int		handle_pipe2(t_comand *com, char ***envvar, pid_t *pid)
@@ -90,19 +90,23 @@ int		handle_pipe(t_comand *com, char ***envvar)
 
 int		pipe_redir_run(t_comand *com, char ***envvar)
 {
-	int	status;
+	int		exit_status;
 
-	status = 0;
+	exit_status = 0;
+	if (!ft_strrncmp(com->argv.arr[0], "minishell", 9))
+		g_shell.subshell = 1;
 	if (!com->message)
 	{
 		dup2(com->fd_in, STDIN_FILENO);
 		dup2(com->fd_out, STDOUT_FILENO);
 	}
 	if (com->pipe_before || com->pipe_after)
-		status = handle_pipe(com, envvar);
+		exit_status = handle_pipe(com, envvar);
 	else if (com->argv.arr[0])
-		status = run_command(com->argv.arr[0], com->argv.arr, envvar);
+		exit_status = run_command(com, com->argv.arr[0],
+		com->argv.arr, envvar);
+	exit_status += (exit_status == 2 || exit_status == 3) ? 128 : 0;
 	dup2(g_shell.save_fds[0], STDIN_FILENO);
 	dup2(g_shell.save_fds[1], STDOUT_FILENO);
-	return (status);
+	return (exit_status);
 }

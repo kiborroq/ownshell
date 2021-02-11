@@ -54,7 +54,7 @@ char	*append_dir(char *pathname, char **envvar)
 	return (file_not_found ? NULL : temp);
 }
 
-int		run_command(char *pathname, char **argv, char ***envvar)
+int		run_command(t_comand *com, char *pathname, char **argv, char ***envvar)
 {
 	static int		(*run_builtin[7])(char *pathname, char **argv,
 					char ***envvar) = {exec_echo, exec_cd, exec_pwd,
@@ -69,7 +69,7 @@ int		run_command(char *pathname, char **argv, char ***envvar)
 	else if ((ft_strchr(pathname, '/') && !(pathname_wdir = NULL)) ||
 	(pathname_wdir = append_dir(pathname, *envvar)))
 	{
-		if (!(g_shell.pid = fork()))
+		if (com->pipe_after || com->pipe_before || !(g_shell.pid = fork()))
 		{
 			execve(pathname_wdir ? pathname_wdir : pathname, argv, *envvar);
 			exit(print_error(strerror(errno), pathname, 0));
@@ -79,6 +79,5 @@ int		run_command(char *pathname, char **argv, char ***envvar)
 		exit_status /= (!(exit_status == 2 || exit_status == 3) ? 256 : 1);
 		free(pathname_wdir);
 	}
-	return (exit_status + ((exit_status == 2 || exit_status == 3)
-	? 128 : 0));
+	return (exit_status);
 }

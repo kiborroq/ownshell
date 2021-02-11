@@ -78,6 +78,7 @@ typedef	struct	s_minishell
 	pid_t		pid;
 	int			exit_status;
 	int			save_fds[2];
+	int			subshell;
 }				t_minishell;
 
 /*
@@ -146,7 +147,8 @@ void			child_process(t_comand *com, char ***envvar,
 **exec_commands.c - functions for command execution (both builtin and external)
 */
 
-int				run_command(char *pathname, char **argv, char ***envvar);
+int				run_command(t_comand *com, char *pathname, char **argv,
+				char ***envvar);
 int				find_builtin(char *pathname);
 char			*append_dir(char *pathname, char **envvar);
 
