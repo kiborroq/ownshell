@@ -1,17 +1,5 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   minishell.h                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/12/11 10:59:31 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/02/02 12:55:16 by kiborroq         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
-#ifndef MINISHELL_H
-# define MINISHELL_H
+#ifndef OWNSHELL_H
+# define OWNISHELL_H
 
 # include "../libft/libft.h"
 # include <stdio.h>
