@@ -1,5 +1,5 @@
 #ifndef OWNSHELL_H
-# define OWNISHELL_H
+# define OWNSHELL_H
 
 # include "../libft/libft.h"
 # include <stdio.h>
